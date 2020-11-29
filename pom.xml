@@ -6,7 +6,7 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
-   <build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
