@@ -35,7 +35,6 @@ public class FutureTest {
         assertTrue(true);
         int n=5;
         assertTrue(n==5);
-
     }
     }
 
