@@ -21,3 +21,4 @@ public class Attack {
         this.duration = duration;
     }
 }
+

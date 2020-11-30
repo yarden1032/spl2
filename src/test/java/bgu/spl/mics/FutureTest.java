@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class FutureTest {
@@ -29,4 +30,12 @@ public class FutureTest {
         assertTrue(future.isDone());
         assertTrue(str.equals(future.get()));
     }
-}
+    @Test
+    public void testResolve2_try() {
+        assertTrue(true);
+        int n=5;
+        assertTrue(n==5);
+
+    }
+    }
+
