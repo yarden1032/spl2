@@ -5,7 +5,9 @@
     <artifactId>spl211</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
    <build>
         <plugins>
             <plugin>
@@ -23,6 +25,7 @@
                 <version>2.22.2</version>
             </plugin>
         </plugins>
+
     </build>
     <dependencies>
         <dependency>
@@ -38,4 +41,5 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
 </project>
