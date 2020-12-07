@@ -1,18 +1,14 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Ewok;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
+
 
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
+
 import java.util.concurrent.TimeUnit;
 
 
@@ -37,13 +33,13 @@ public class FutureTest {
         String str = "someResult";
         future.resolve(str);
         assertTrue(future.isDone());
-        assertTrue(str.equals(future.get()));
+        assertEquals(future.get(), str);
     }
 
 
     @Test
     public void testisDone() {
-        assertTrue(!future3.isDone());
+        assertFalse(future3.isDone());
         String str = "someResult";
         future3.resolve(str);
         assertTrue(future3.isDone());
@@ -53,7 +49,7 @@ public class FutureTest {
 
     @Test
     public void testfuture(){
-        String str = "someResult";
+
         assertTrue(future2.isDone());
         TimeUnit time = TimeUnit.SECONDS;
         LocalTime date1= LocalTime.now();
@@ -62,7 +58,7 @@ public class FutureTest {
         LocalTime date3=date2.minus(10, ChronoUnit.SECONDS);
        if(!date3.isBefore(date1))
        {
-           assertTrue(date1.equals(date3));
+           assertEquals(date3, date1);
        }
 
     }

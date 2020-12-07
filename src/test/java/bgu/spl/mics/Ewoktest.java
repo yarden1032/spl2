@@ -3,7 +3,7 @@ package bgu.spl.mics;
 import bgu.spl.mics.application.passiveObjects.Ewok;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Ewoktest {
 
@@ -29,10 +29,10 @@ public class Ewoktest {
         int a=1;
         Ewok ewok= new Ewok(a);
 
-        assertTrue( ewok.getSerialNumber()==a);
+        assertEquals(a, ewok.getSerialNumber());
         assertTrue(ewok.isAvailable());
         ewok.acquire();
-        assertTrue(! ewok.isAvailable());
+        assertFalse(ewok.isAvailable());
         ewok.release();
         assertTrue( ewok.isAvailable());
 
