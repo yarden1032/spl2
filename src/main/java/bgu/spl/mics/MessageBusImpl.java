@@ -16,8 +16,9 @@ import java.util.Queue;
  */
 public class MessageBusImpl implements MessageBus {
 	//list of queue
-	private static MessageBusImpl instance = null;
-
+	private static class SingletonHolder{
+	private static MessageBusImpl instance = new MessageBusImpl();
+	}
 
 	private  List<Queue<Message>> allMessages;
 	private  int indexOfRoundRobin=0;
@@ -54,10 +55,8 @@ private List<Event> eventOfFutures;
 
 	}
 	public synchronized static MessageBusImpl getInstance() {
-		if(instance == null) {
-			instance = new MessageBusImpl();
-		}
-		return instance;
+
+		return SingletonHolder.instance;
 	}
 
 	@Override
