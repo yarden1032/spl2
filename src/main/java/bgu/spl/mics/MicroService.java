@@ -4,7 +4,7 @@ import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BombDestryerEvent;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
-
+import bgu.spl.mics.MessageBusImpl;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -30,14 +30,15 @@ import java.util.Queue;
 public abstract class MicroService implements Runnable { 
 
     private String name;
-    private Queue<Message> incommingMessages;
+    private int index=MessageBusImpl.getInstance().getAllMessages().indexOf(this);
+    private Queue<Message> incommingMessages=MessageBusImpl.getInstance().getAllMessages().get(index);
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
     	this.name=name;
-    	incommingMessages=new LinkedList<>();
+
 
 
     }
@@ -104,8 +105,11 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-    	
-        return null; 
+
+        Future<T> f=  MessageBusImpl.getInstance().sendEvent(e);
+
+
+        return f;
     }
 
     /**
@@ -115,7 +119,8 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-    	
+        MessageBusImpl.getInstance().sendBroadcast(b);
+
     }
 
     /**
@@ -150,7 +155,7 @@ public abstract class MicroService implements Runnable {
      *         construction time and is used mainly for debugging purposes.
      */
     public final String getName() {
-        return null;
+        return name;
     }
 
     /**
@@ -159,7 +164,12 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-while (!incommingMessages.isEmpty())
+        try {
+        MessageBusImpl.getInstance().awaitMessage(this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        /*
         if (incommingMessages.isEmpty())
         {
             try {
@@ -169,13 +179,14 @@ while (!incommingMessages.isEmpty())
             }
         }
         else {
-            Message thisMessage = incommingMessages.poll();
 
-///TODO: think about other option
+               Message  thisMessage = incommingMessages.poll();
+
+
             if (thisMessage.getClass() == AttackEvent.class) {
                 AttackEvent Aevent = (AttackEvent) thisMessage;
                 //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-                Aevent.getCallback().call(Aevent.getDuration());
+                 Aevent.getCallback().call(Aevent.getDuration());
             }
             if (thisMessage.getClass() == BombDestryerEvent.class) {
                 BombDestryerEvent bombevent = (BombDestryerEvent) thisMessage;
@@ -188,7 +199,7 @@ while (!incommingMessages.isEmpty())
                 deactivateevent.getCallback().call(this);
             }
             run();
-        }
+        }*/
 
     }
 
