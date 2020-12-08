@@ -6,7 +6,7 @@ package bgu.spl.mics;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBusImpl implements MessageBus {
-	
+	//list of queue
 	
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
@@ -18,7 +18,7 @@ public class MessageBusImpl implements MessageBus {
 		
     }
 
-	@Override @SuppressWarnings("unchecked")
+	@Override
 	public <T> void complete(Event<T> e, T result) {
 		
 	}
@@ -37,7 +37,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void register(MicroService m) {
-		
+
 	}
 
 	@Override

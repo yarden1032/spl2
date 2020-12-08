@@ -15,10 +15,16 @@ public class R2D2Microservice extends MicroService {
 
     public R2D2Microservice(long duration) {
         super("R2D2");
-    }
+        this.duration=duration;
 
+    }
+    private long duration;
     @Override
     protected void initialize() {
 
+    }
+    public long getDuration (){
+
+        return duration;
     }
 }

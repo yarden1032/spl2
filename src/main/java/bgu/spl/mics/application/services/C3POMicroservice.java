@@ -1,5 +1,8 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.Broadcast;
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 
@@ -14,7 +17,7 @@ import bgu.spl.mics.application.messages.AttackEvent;
  */
 public class C3POMicroservice extends MicroService {
 	
-    public C3POMicroservice() {
+    public C3POMicroservice(MessageBusImpl messageBus) {
         super("C3PO");
     }
 
@@ -22,4 +25,14 @@ public class C3POMicroservice extends MicroService {
     protected void initialize() {
 
     }
+    protected void initialize(MessageBusImpl messageBus) {
+        messageBus.register(this);
+        messageBus.subscribeEvent(AttackEvent.class, this);
+        messageBus.subscribeBroadcast(Broadcast.class,this);
+        //register
+        //subscribe event to attack
+        //subscribe broadcast
+        //run ->if nothing wait for messages
+    }
+
 }

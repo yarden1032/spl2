@@ -1,5 +1,14 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.BombDestryerEvent;
+import bgu.spl.mics.application.messages.DeactivationEvent;
+import bgu.spl.mics.application.passiveObjects.Attack;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 /**
  * The MicroService is an abstract class that any micro-service in the system
  * must extend. The abstract MicroService class is responsible to get and
@@ -19,14 +28,18 @@ package bgu.spl.mics;
  * <p>
  */
 public abstract class MicroService implements Runnable { 
-    
 
+    private String name;
+    private Queue<Message> incommingMessages;
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
-    	
+    	this.name=name;
+    	incommingMessages=new LinkedList<>();
+
+
     }
 
     /**
@@ -146,7 +159,37 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-    	
+while (!incommingMessages.isEmpty())
+        if (incommingMessages.isEmpty())
+        {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            Message thisMessage = incommingMessages.poll();
+
+///TODO: think about other option
+            if (thisMessage.getClass() == AttackEvent.class) {
+                AttackEvent Aevent = (AttackEvent) thisMessage;
+                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+                Aevent.getCallback().call(Aevent.getDuration());
+            }
+            if (thisMessage.getClass() == BombDestryerEvent.class) {
+                BombDestryerEvent bombevent = (BombDestryerEvent) thisMessage;
+                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+                bombevent.getCallback().call(this);
+            }
+            if (thisMessage.getClass() == DeactivationEvent.class) {
+                DeactivationEvent deactivateevent = (DeactivationEvent) thisMessage;
+                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+                deactivateevent.getCallback().call(this);
+            }
+            run();
+        }
+
     }
 
 }
