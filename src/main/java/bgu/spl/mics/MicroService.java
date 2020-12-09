@@ -2,12 +2,10 @@ package bgu.spl.mics;
 
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BombDestryerEvent;
+import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.messages.DeactivationEvent;
-import bgu.spl.mics.application.passiveObjects.Attack;
-import bgu.spl.mics.MessageBusImpl;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import bgu.spl.mics.application.passiveObjects.Diary;
+import bgu.spl.mics.application.services.*;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -30,15 +28,14 @@ import java.util.Queue;
 public abstract class MicroService implements Runnable { 
 
     private String name;
-    private int index=MessageBusImpl.getInstance().getAllMessages().indexOf(this);
-    private Queue<Message> incommingMessages=MessageBusImpl.getInstance().getAllMessages().get(index);
+   /* private int index=MessageBusImpl.getInstance().getAllMessages().indexOf(this);
+    private Queue<Message> incommingMessages=MessageBusImpl.getInstance().getAllMessages().get(index);*/
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
     	this.name=name;
-
 
 
     }
@@ -65,7 +62,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-    	
+
+
     }
 
     /**
@@ -134,7 +132,7 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-    	
+    	MessageBusImpl.getInstance().complete(e,result);
     }
 
     /**
@@ -147,7 +145,9 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
-    	
+        Diary.getInstance().setLittleDiary(name+"Terminate",System.currentTimeMillis());
+        Thread.currentThread().interrupt();
+
     }
 
     /**
@@ -164,11 +164,43 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        try {
-        MessageBusImpl.getInstance().awaitMessage(this);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                Message current = MessageBusImpl.getInstance().awaitMessage(this);
+                if ("Han".equals(getName()) && current.getClass() == AttackEvent.class) {
+                    ((HanSoloMicroservice) this).InitiateAttack(current);
+                }
+
+                if (("C3PO".equals(getName()) && current.getClass() == AttackEvent.class)) {
+                    ((C3POMicroservice) this).InitiateAttack(current);
+
+                }
+                if (("R2D2".equals(getName()) && current.getClass() == DeactivationEvent.class)) {
+                    ((R2D2Microservice) this).InitiateDeactivation();
+                }
+                if (("Lando".equals(getName()) && current.getClass() == BombDestryerEvent.class)) {
+                    ((LandoMicroservice) this).InitiateBombardment();
+                }
+                if (current.getClass() == BroadcastImpl.class) {
+                    if (this.getName().equals("Leia")) {
+                        ((LeiaMicroservice) this).handleBoradcast(current);
+                    }
+                    BroadcastImpl b = (BroadcastImpl) current;
+                    if (b.getWhoSendIt().equals("Leia")) {
+                        terminate();
+
+                    }
+
+
+                }
+
+            } catch (InterruptedException e) {
+
+
+                Thread.currentThread().interrupt();
+
+
+            }
         /*
         if (incommingMessages.isEmpty())
         {
@@ -201,6 +233,7 @@ public abstract class MicroService implements Runnable {
             run();
         }*/
 
+        }
     }
 
 }

@@ -11,6 +11,8 @@ import java.util.Objects;
 public class Ewok {
 	int serialNumber;
 	boolean available;
+	boolean inUse=false;
+
 
     public Ewok (int serialNumber)
     {
@@ -29,8 +31,23 @@ public class Ewok {
         this.available = available;
     }
 
-    public boolean isAvailable() {
-        return available;
+    public synchronized boolean isAvailable() {
+
+        while (inUse)
+        {
+            try {
+
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+       inUse = true;
+        boolean temp = available;
+        inUse = false;
+        notify();
+        return temp;
+
     }
 
     @Override
@@ -50,14 +67,41 @@ public class Ewok {
     /**
      * Acquires an Ewok
      */
-    public void acquire() {
+    public synchronized void acquire() {
+
+
+        while (inUse)
+        {
+            try {
+
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        inUse = true;
         this.available=false;
+        inUse = false;
+        notify();
+
     }
 
     /**
      * release an Ewok
      */
-    public void release() {
+    public synchronized void release() {
+        while (inUse)
+        {
+            try {
+
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        inUse = true;
         this.available=true;
+        inUse = false;
+        notify();
     }
 }

@@ -10,6 +10,6 @@ public class DeactivationEvent implements Event<Boolean> {
 
     @Override
     public Callback getCallback() {
-        return null;
+        return callbackAttack;
     }
 }

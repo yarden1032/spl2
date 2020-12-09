@@ -34,26 +34,28 @@ public class MessageBusTest {
         };
 
     }
-    @Test
+    /*   @Test
 
-    public void testRegister(){
+       public void testRegister(){
 
-        messageBus.register(microService1); //נוצר פה תור
-        Event<String> eventest=new Event<String>() {
+           messageBus.register(microService1); //נוצר פה תור
+           Event<String> eventest=new Event<String>() {
 
-        };
-        //messageBus.subscribeEvent( ,microService1);
+           };
+           //messageBus.subscribeEvent( ,microService1);
 
-        try {
-            messageBus.sendEvent(eventest);
-            messageBus.awaitMessage(microService1);
+           try {
+               messageBus.sendEvent(eventest);
+               messageBus.awaitMessage(microService1);
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail("Test Fail - no message received");
-        }
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+               fail("Test Fail - no message received");
+           }
 
-    }
+       }
+
+    *//*
     @Test
     public void testRegister_fail() {
 
@@ -132,7 +134,7 @@ public class MessageBusTest {
         testUnRegister();
         testBroadcast();
   /**/
-
+/*
     }
     @Test
     public void testFutureSendEvent() {
@@ -191,5 +193,5 @@ public class MessageBusTest {
         microService1.complete(attc,true);
        assertTrue(future.isDone());
     }
-
+*/
 }

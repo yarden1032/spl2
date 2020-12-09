@@ -30,22 +30,34 @@ public class Future<T> {
      * 	       
      */
 	public T get() {
-		
-        return null; 
-	}
+
+		while (!isDone)
+			try {
+				wait();
+			} catch (InterruptedException e) {
+
+			}
+
+
+		return result;
+		}
+
 	
 	/**
      * Resolves the result of this Future object.
      */
 	public void resolve (T result) {
-		
+
+		this.result=result;
+		isDone=true;
+		notify();
 	}
 	
 	/**
      * @return true if this object has been resolved, false otherwise
      */
 	public boolean isDone() {
-		return false;
+		return isDone;
 	}
 	
 	/**
@@ -60,8 +72,25 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		
-        return null;
+
+
+
+
+		if (!isDone)
+			try {
+				wait(unit.toMillis(timeout));
+			} catch (InterruptedException ignored) {
+
+			}
+
+		if(isDone)
+		return result;
+
+		return null;
 	}
 
-}
+
+
+	}
+
+

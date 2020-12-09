@@ -27,7 +27,7 @@ public class LandoMicroservice  extends MicroService {
         messageBus.subscribeEvent(BombDestryerEvent.class, this);
         messageBus.subscribeBroadcast(Broadcast.class,this);
         //register
-        //subscribe event to attack
+        //subscribe event to bomb
         //subscribe broadcast
         //run ->if nothing wait for messages
     }
@@ -36,6 +36,15 @@ public class LandoMicroservice  extends MicroService {
 
         return duration;
     }
+    public void InitiateBombardment()
+    {
+        try {
+            wait(duration);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 }
 
 
