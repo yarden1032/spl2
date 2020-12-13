@@ -23,8 +23,15 @@ public class C3POMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-
+        MessageBusImpl.getInstance().register(this);
+        MessageBusImpl.getInstance().subscribeEvent(AttackEvent.class, this);
+        MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
+        //register
+        //subscribe event to attack
+        //subscribe broadcast
+        //run ->if nothing wait for messages
     }
+
     protected void initialize(MessageBusImpl messageBus) {
         messageBus.register(this);
         messageBus.subscribeEvent(AttackEvent.class, this);
@@ -35,6 +42,16 @@ public class C3POMicroservice extends MicroService {
         //run ->if nothing wait for messages
     }
     public void InitiateAttack(Message current) {
+
+       /* CallbackAttack callbackAttack=new CallbackAttack();
+        callbackAttack.call(current);
+*/
+
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
+        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
+
+
+        /*
         AttackEvent currentAttack = (AttackEvent) current;
         for (int i = 0; i < currentAttack.getSerialNumbers().size(); i++){
 
@@ -69,7 +86,7 @@ public class C3POMicroservice extends MicroService {
         });
         MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
         Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
-
+*/
     }
 
 

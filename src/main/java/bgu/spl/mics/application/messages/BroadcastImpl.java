@@ -10,19 +10,23 @@ public class BroadcastImpl implements Broadcast {
     private String whoSendIt;
     private long whenSentIt;
 
-    public BroadcastImpl(String whoSendIt, long whenSentIt)
-    {
-
+    public BroadcastImpl(String whoSendIt, long whenSentIt) {
+        this.whoSendIt = whoSendIt;
+        this.whenSentIt = whenSentIt;
+        callbackBroadcast=new CallbackBroadcast();
     }
 
-    public Callback getCallback() {
-        return callbackBroadcast;
+      public Callback getCallback() {
+          return callbackBroadcast;
+      }
+
+
+    public String getWhoSendIt() {
+        return whoSendIt;
     }
 
 
-public String getWhoSendIt()
-{
-    return whoSendIt;
-}
-
+    public long getWhenSentIt() {
+        return whenSentIt;
+    }
 }

@@ -38,12 +38,26 @@ public class HanSoloMicroservice extends MicroService {
     @Override
     protected void initialize() {
 
+        MessageBusImpl.getInstance().register(this);
+        MessageBusImpl.getInstance().subscribeEvent(AttackEvent.class, this);
+        MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
 
 
         //this is empty initialize - we won't use it
     }
 
     public void InitiateAttack(Message current) {
+
+
+     /*   CallbackAttack callbackAttack=new CallbackAttack();
+        callbackAttack.call(current);*/
+
+
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
+        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
+
+         /*
+
         AttackEvent currentAttack = (AttackEvent) current;
         for (int i = 0; i < currentAttack.getSerialNumbers().size(); i++){
 
@@ -78,6 +92,8 @@ public class HanSoloMicroservice extends MicroService {
 
         MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
         Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
+
+    */
     }
 
 

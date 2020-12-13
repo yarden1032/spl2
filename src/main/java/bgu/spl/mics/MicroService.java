@@ -63,10 +63,15 @@ public abstract class MicroService implements Runnable {
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
 
+        MessageBusImpl.getInstance().subscribeEvent(type,this);
+
+        /*when we subscribe we also save the callback here in a list
+        when we get a message we also get a callback and then just run the callback
+        */
 
     }
 
-    /**
+    /**E==EVENTATTACK
      * Subscribes to broadcast message of type {@code type} with the callback
      * {@code callback}. This means two things:
      * 1. Subscribe to broadcast messages in the singleton event-bus using the
@@ -164,74 +169,60 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        initialize();
+        while (true) {
             try {
+
                 Message current = MessageBusImpl.getInstance().awaitMessage(this);
-                if ("Han".equals(getName()) && current.getClass() == AttackEvent.class) {
-                    ((HanSoloMicroservice) this).InitiateAttack(current);
-                }
 
-                if (("C3PO".equals(getName()) && current.getClass() == AttackEvent.class)) {
-                    ((C3POMicroservice) this).InitiateAttack(current);
+                if (current!=null) {
 
-                }
-                if (("R2D2".equals(getName()) && current.getClass() == DeactivationEvent.class)) {
-                    ((R2D2Microservice) this).InitiateDeactivation();
-                }
-                if (("Lando".equals(getName()) && current.getClass() == BombDestryerEvent.class)) {
-                    ((LandoMicroservice) this).InitiateBombardment();
-                }
-                if (current.getClass() == BroadcastImpl.class) {
-                    if (this.getName().equals("Leia")) {
-                        ((LeiaMicroservice) this).handleBoradcast(current);
-                    }
-                    BroadcastImpl b = (BroadcastImpl) current;
-                    if (b.getWhoSendIt().equals("Leia")) {
-                        terminate();
-
+                    if ("Han".equals(getName()) && current.getClass() == AttackEvent.class) {
+                        ((HanSoloMicroservice) this).InitiateAttack(current);
                     }
 
+                    if (("C3PO".equals(getName()) && current.getClass() == AttackEvent.class)) {
+                        ((C3POMicroservice) this).InitiateAttack(current);
+
+                    }
+                    if (("R2D2".equals(getName()) && current.getClass() == DeactivationEvent.class)) {
+                        ((R2D2Microservice) this).InitiateDeactivation();
+                    }
+                    if (("Lando".equals(getName()) && current.getClass() == BombDestryerEvent.class)) {
+                        ((LandoMicroservice) this).InitiateBombardment();
+                    }
+                    if (current.getClass() == BroadcastImpl.class) {
+                        if (this.getName().equals("Leia")) {
+                            ((LeiaMicroservice) this).handleBoradcast(current);
+                        }
+                        BroadcastImpl b = (BroadcastImpl) current;
+                        if (b.getWhoSendIt().equals("Leia")) {
+                            terminate();
+
+                        }
+
+
+                    }
+                }
+                else {
+                  /*  Object obj=new Object();
+                    synchronized (obj){*/
+
+
+
+                  //  MessageBusImpl.getInstance().wait();
 
                 }
+
 
             } catch (InterruptedException e) {
-
 
                 Thread.currentThread().interrupt();
 
 
             }
-        /*
-        if (incommingMessages.isEmpty())
-        {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-
-               Message  thisMessage = incommingMessages.poll();
 
 
-            if (thisMessage.getClass() == AttackEvent.class) {
-                AttackEvent Aevent = (AttackEvent) thisMessage;
-                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-                 Aevent.getCallback().call(Aevent.getDuration());
-            }
-            if (thisMessage.getClass() == BombDestryerEvent.class) {
-                BombDestryerEvent bombevent = (BombDestryerEvent) thisMessage;
-                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-                bombevent.getCallback().call(this);
-            }
-            if (thisMessage.getClass() == DeactivationEvent.class) {
-                DeactivationEvent deactivateevent = (DeactivationEvent) thisMessage;
-                //       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-                deactivateevent.getCallback().call(this);
-            }
-            run();
-        }*/
 
         }
     }

@@ -3,6 +3,7 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.MessageBusImpl;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,29 +15,38 @@ import java.util.List;
  * You can add ONLY private methods and fields to this class.
  */
 public class Ewoks {
+    private static class SingletonHolder {
 
-    List<Ewok>  ewokList;
 
-    public Ewoks() {
-        ewokList=null;
-    }
-
-    private static class SingletonHolder{
         private static Ewoks instance = new Ewoks();
     }
+   private List<Ewok>  ewokList=null;
+
+
+    public Ewoks() {
+        ewokList=new LinkedList<>();
+
+    }
+
+
     public synchronized static Ewoks getInstance() {
 
-        return Ewoks.SingletonHolder.instance;
+        return SingletonHolder.instance;
     }
-    public void add(List<Ewok>  ewokList)
+    public void add(List<Ewok>  l)
     {
-       this.ewokList.addAll(ewokList);
+for (int i=0;i<l.size();i++)
+       this.ewokList.add(l.get(i));
     }
     public List<Ewok> getEwokList()
     {
         return ewokList;
     }
 
+    public boolean isAvailable(int serial)
+    {
+        return ewokList.get(serial-1).isAvailable();
+    }
 
 
 

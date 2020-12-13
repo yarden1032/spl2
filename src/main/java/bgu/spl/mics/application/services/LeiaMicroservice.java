@@ -9,6 +9,7 @@ import bgu.spl.mics.application.messages.BombDestryerEvent;
 import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 
 /**
@@ -21,7 +22,7 @@ import bgu.spl.mics.application.passiveObjects.Ewoks;
  */
 public class LeiaMicroservice extends MicroService {
 	private Attack[] attacks;
-	private int counterAttackerfinish=0;
+	private int counterAttackerfinish=0; //TODO: can be atomic
 	
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
@@ -30,7 +31,12 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-    	
+        MessageBusImpl.getInstance().register(this);
+        MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
+        //register
+        //subscribe event to attack
+        //subscribe broadcast
+        //run ->if nothing wait for messages
     }
     protected void initialize(MessageBusImpl messageBus){
 
@@ -42,19 +48,17 @@ public class LeiaMicroservice extends MicroService {
         //run ->if nothing wait for messages
 
     }
-    public void startAttack ()
-    {
-        for (int i=0;i<attacks.length;i++)
-        {
-            AttackEvent attackEvent= new AttackEvent(attacks[i].getSerials(),attacks[i].getDuration());
+    public synchronized void startAttack () {
+        Object ob = new Object();
+        synchronized (ob) {
+            for (int i = 0; i < attacks.length; i++) {
+                AttackEvent attackEvent = new AttackEvent(attacks[i].getSerials(), attacks[i].getDuration());
+
+                        MessageBusImpl.getInstance().sendEvent(attackEvent);
 
 
-            MessageBusImpl.getInstance().sendEvent(attackEvent);
-
-
+            }
         }
-
-
     }
 
     public void handleBoradcast (Message current)
@@ -62,11 +66,14 @@ public class LeiaMicroservice extends MicroService {
         BroadcastImpl b= (BroadcastImpl) current;
         if (b.getWhoSendIt().equals("Han") ||b.getWhoSendIt().equals("C3PO"))
         {
+
             counterAttackerfinish++;
-            if (Thread.State.WAITING)///todo here
+
+            if (counterAttackerfinish==attacks.length)///todo here
             {
                 DeactivationEvent deactivationEvent= new DeactivationEvent();
                 MessageBusImpl.getInstance().sendEvent(deactivationEvent);
+                Diary.getInstance().setLittleDiary("TotalAttacks",System.currentTimeMillis());
             }
 
 

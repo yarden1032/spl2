@@ -32,7 +32,13 @@ public class Diary {
         Object arr[]=new Object[2];
         arr[0]=message;
         arr[1]=timestamp;
+        if (message.equals("TotalAttacks"))
+        {
+            littleDiary.add(0,arr);
+        }
         littleDiary.add(arr);
+
+
 
     }
     public  List<Object> getLittleDiary()

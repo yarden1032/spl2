@@ -8,13 +8,14 @@ public class CallbackBombDestroyer  implements Callback {
 
     @Override
     public void call(Object c) {
-        LandoMicroservice tempobject=(LandoMicroservice) c ;
-        long n= tempobject.getDuration();
-        try {
-            wait(n);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        LandoMicroservice m= (LandoMicroservice) c;
+        long duration= m.getDuration();
 
+        try {
+            Thread.sleep(duration);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

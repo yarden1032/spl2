@@ -1,6 +1,15 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.internal.LinkedTreeMap;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -10,17 +19,20 @@ import java.util.List;
  * YDo not add any additional members/method to this class (except for getters).
  */
 public class Attack {
-    final List<Integer> serials;
+    final Integer [] serials; //List<Integer>
     final int duration;
 
     /**
      * Constructor.
      */
-    public Attack(List<Integer> serialNumbers, int duration) {
-        this.serials = serialNumbers;
+
+    public Attack(Integer [] serialNumbers, int duration) {
+
+        serials=serialNumbers;
+
         this.duration = duration;
     }
-    public List<Integer> getSerials()
+    public Integer [] getSerials()
     {
         return serials;
     }
@@ -28,5 +40,20 @@ public class Attack {
     {
         return duration;
     }
+    public Attack(ArrayList attacksInput , Object n)
+    {
+                Gson gson = new Gson();
+                JsonObject jsonObject = gson.toJsonTree(n).getAsJsonObject();
+                duration=(jsonObject.get("duration")).getAsInt();
+                JsonArray jsSerials=jsonObject.get("serials").getAsJsonArray();
+                serials=new Integer[jsSerials.size()];
+        for (int i=0; i < jsSerials.size(); i++) {
+           serials[i] =jsSerials.get(i).getAsInt();
+        }
+
+
+
+    }
+
 }
 

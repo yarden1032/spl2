@@ -20,12 +20,18 @@ public class LandoMicroservice  extends MicroService {
     private long duration;
     @Override
     protected void initialize() {
-       
+        MessageBusImpl.getInstance().register(this);
+        MessageBusImpl.getInstance().subscribeEvent(BombDestryerEvent.class, this);
+        MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
+        //register
+        //subscribe event to bomb
+        //subscribe broadcast
+        //run ->if nothing wait for messages
     }
     protected void initialize(MessageBusImpl messageBus) {
-        messageBus.register(this);
-        messageBus.subscribeEvent(BombDestryerEvent.class, this);
-        messageBus.subscribeBroadcast(Broadcast.class,this);
+        MessageBusImpl.getInstance().register(this);
+        MessageBusImpl.getInstance().subscribeEvent(BombDestryerEvent.class, this);
+        MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
         //register
         //subscribe event to bomb
         //subscribe broadcast
@@ -39,7 +45,7 @@ public class LandoMicroservice  extends MicroService {
     public void InitiateBombardment()
     {
         try {
-            wait(duration);
+            Thread.sleep(duration);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

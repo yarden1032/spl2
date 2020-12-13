@@ -9,13 +9,14 @@ public class CallbackDeactivation  implements Callback {
 
     @Override
     public void call(Object c) {
-        R2D2Microservice tempobject=(R2D2Microservice) c ;
-        long n= tempobject.getDuration();
-        try {
-            wait(n);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        R2D2Microservice m= (R2D2Microservice) c;
+        long duration= m.getDuration();
 
+        try {
+            Thread.sleep(duration);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
