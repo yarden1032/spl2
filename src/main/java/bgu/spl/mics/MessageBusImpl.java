@@ -4,7 +4,7 @@ import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BombDestryerEvent;
 import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.messages.DeactivationEvent;
-import bgu.spl.mics.application.passiveObjects.Attack;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,8 +38,8 @@ private final int ammountOfEvents=4;
 	private final int Attacklocation=1;
 	private final int Bomblocation=2;
 	private final int Deactivatelocation=3;
-
-
+	private  Object key= new Object();
+	private List<MicroService> listofAttackMicroservices;
 
 	public  List<Queue<Message>> getAllMessages()
 		{
@@ -52,13 +52,14 @@ private final int ammountOfEvents=4;
 
 	public MessageBusImpl()
 	{
-		allMessages=new LinkedList<Queue<Message>>();
-		registeredMicroservices=new LinkedList<MicroService>();
-		final int c=4;
-		MessageQueuebool=new LinkedList<List<Boolean>>();
-		futureList =new LinkedList<Future>();
-		eventOfFutures=new LinkedList<Event>();
-		threads=new LinkedList<Thread>();
+		listofAttackMicroservices=new LinkedList<>();
+		allMessages=new LinkedList<>();
+		registeredMicroservices=new LinkedList<>();
+
+		MessageQueuebool=new LinkedList<>();
+		futureList =new LinkedList<>();
+		eventOfFutures=new LinkedList<>();
+		threads=new LinkedList<>();
 
 	}
 	public synchronized static MessageBusImpl getInstance() {
@@ -68,35 +69,39 @@ private final int ammountOfEvents=4;
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+		synchronized (key) {
+			if (registeredMicroservices != null && registeredMicroservices.contains(m)) {
+				int i = registeredMicroservices.indexOf(m);
 
-		if (registeredMicroservices!=null&&registeredMicroservices.contains(m)) {
-			int i=registeredMicroservices.indexOf(m);
-			//need to check if it registered at all
-			//System.out.println(type.getName());
-			//System.out.println(AttackEvent.class.getName());
 
-			if (type.getName().equals(AttackEvent.class.getName())) {
-				MessageQueuebool.get(i).set(Attacklocation, true);
-				CallbackAttack c=new CallbackAttack ();
-				//m.subscribeEvent(type,c);
+
+				if (type.getName().equals(AttackEvent.class.getName())) {
+					MessageQueuebool.get(i).set(Attacklocation, true);
+					CallbackAttack c = new CallbackAttack();
+					if (listofAttackMicroservices.size() == 0) {
+						indexOfRoundRobin = i;
+					}
+
+					listofAttackMicroservices.add(m);
+
+				}
+
+				if (type.getName().equals(BombDestryerEvent.class.getName())) {
+					MessageQueuebool.get(i).set(Bomblocation, true);
+					CallbackBombDestroyer c = new CallbackBombDestroyer();
+
+				}
+
+				if (type.getName().equals(DeactivationEvent.class.getName())) {
+					MessageQueuebool.get(i).set(Deactivatelocation, true);
+					CallbackDeactivation c = new CallbackDeactivation();
+
+				}
+
 			}
 
-			if (type.getName().equals(BombDestryerEvent.class.getName())) {
-				MessageQueuebool.get(i).set(Bomblocation, true);
-				CallbackBombDestroyer c=new CallbackBombDestroyer ();
-				//m.subscribeEvent(type,c);
-			}
-
-			if (type.getName().equals(DeactivationEvent.class.getName())) {
-				MessageQueuebool.get(i).set(Deactivatelocation, true);
-				CallbackDeactivation c=new CallbackDeactivation ();
-			//	m.subscribeEvent(type,c);
-			}
 
 		}
-
-
-
 	}
 
 
@@ -147,97 +152,85 @@ private final int ammountOfEvents=4;
 
 	@Override
 	public synchronized void sendBroadcast(Broadcast b) {
-		for (int i=0;i<MessageQueuebool.size();i++)
-		{
-			if(MessageQueuebool.get(i).get(Broadcastlocation)) {
-				//int index = MessageQueuebool.indexOf(i);
-				allMessages.get(i).add(b);
-			//	Thread.currentThread().notifyAll();
+
+		synchronized (key) {
+			for (int i = 0; i < MessageQueuebool.size(); i++) {
+				if (MessageQueuebool.get(i).get(Broadcastlocation)) {
+
+					allMessages.get(i).add(b);
 
 
-			}
-		/*
-		MessageQueuebool.forEach((temp) ->{
-			if(temp.get(Broadcastlocation))
-			{
-				int index=MessageQueuebool.indexOf(temp);
-				allMessages.get(index).add(b);
-				notifyAll();
-			}
 
 				}
 
-				);*/
 
+
+			}
+			MessageBusImpl.getInstance().notifyAll();
 
 		}
-		MessageBusImpl.getInstance().notifyAll();
 	}
 
 
-	
+
 	@Override
-	 public synchronized <T> Future<T> sendEvent(Event<T> e) {
-		Future<T> f= new Future();
-		if (e.getClass()==AttackEvent.class) {
-			allMessages.get(indexOfRoundRobin).add(e);
-			int currentsize = registeredMicroservices.size();
-			//notifyAll();
-			threads.get(indexOfRoundRobin).interrupt();
-			//registeredMicroservices.get(indexOfRoundRobin)
+	 public <T> Future<T> sendEvent(Event<T> e) {
 
-			while (true) {
-				if (indexOfRoundRobin < currentsize)
-					indexOfRoundRobin++;
-				else
-					indexOfRoundRobin = 0;
+			Future<T> f = new Future();
+		synchronized (key) {
+			if (e.getClass() == AttackEvent.class) {
+				int currentsize = listofAttackMicroservices.size();
+					allMessages.get(indexOfRoundRobin).add(e);
 
-				if (indexOfRoundRobin < currentsize)
-					if (MessageQueuebool.get(indexOfRoundRobin).get(Attacklocation)) {
-						break;
+					threads.get(indexOfRoundRobin).interrupt();
+
+
+				MicroService current=registeredMicroservices.get(indexOfRoundRobin);
+
+				int index=listofAttackMicroservices.indexOf(registeredMicroservices.get(indexOfRoundRobin));
+					if (index < currentsize-1) {
+						MicroService next;
+
+						next = listofAttackMicroservices.get(listofAttackMicroservices.indexOf(current)+1);
+						indexOfRoundRobin=registeredMicroservices.indexOf(next);
+
+					}else {
+						MicroService next;
+
+						next = listofAttackMicroservices.get(0);
+						indexOfRoundRobin=registeredMicroservices.indexOf(next);
 					}
-			}
 
 
 
+			} else {
 
-		}
-        else{
-        	if (e.getClass()==DeactivationEvent.class)
-			{
-				for (int i=0;i<registeredMicroservices.size();i++)
-				{
-					if(MessageQueuebool.get(i).get(Deactivatelocation))
-					{
-						allMessages.get(i).add(e);
-						threads.get(i).interrupt();
+					if (e.getClass() == DeactivationEvent.class) {
+						for (int i = 0; i < registeredMicroservices.size(); i++) {
+							if (MessageQueuebool.get(i).get(Deactivatelocation)) {
+								allMessages.get(i).add(e);
+								threads.get(i).interrupt();
+							}
+						}
+					} else {
+						for (int i = 0; i < registeredMicroservices.size(); i++) {
+							if (MessageQueuebool.get(i).get(Bomblocation)) {
+								allMessages.get(i).add(e);
+								threads.get(i).interrupt();
+							}
+						}
 					}
 				}
 			}
-        	else {
-				for (int i=0;i<registeredMicroservices.size();i++)
-				{
-					if(MessageQueuebool.get(i).get(Bomblocation))
-					{
-						allMessages.get(i).add(e);
-						threads.get(i).interrupt();
-					}
-				}
-			}
+			eventOfFutures.add(e);
+			futureList.add(f);
+			return f;
 		}
 
-		eventOfFutures.add(e);
-		futureList.add(f);
-        return f;
-	}
 
 	@Override
 	public synchronized void  register(MicroService m) {
-		/*if(registeredMicroservices.size()==0)
-		{
-			registeredMicroservices=new LinkedList<MicroService>();
 
-		}*/
 		threads.add(Thread.currentThread());
 		registeredMicroservices.add(m);
 		MessageQueuebool.add(new LinkedList<Boolean>());
@@ -253,75 +246,92 @@ private final int ammountOfEvents=4;
 			registeredMicroservices.remove(m);
 			MessageQueuebool.remove(i);
 			allMessages.remove(i);
+			threads.remove(i);
+			if(registeredMicroservices.size()==0)
+			{
+				futureList.clear();
+				eventOfFutures.clear();
+			}
+			if (listofAttackMicroservices.contains(m))
+			{
+				int temp=listofAttackMicroservices.indexOf(m);
+				listofAttackMicroservices.remove(temp);
+			}
+
+
+
+
 		}
 	}
 
 	@Override
 	public synchronized Message  awaitMessage(MicroService m) throws InterruptedException {
-		 while (!Thread.currentThread().isInterrupted()) {
+
 			 if (!registeredMicroservices.contains(m))
 				 throw new IllegalStateException();
 
 
 			 int i = registeredMicroservices.indexOf(m);
 			 Queue<Message> incommingMessages = allMessages.get(i);
-			 boolean b = incommingMessages.isEmpty();
-			 Object key = new Object();
+		boolean b=false;
+			 synchronized (key) {
+				  b = incommingMessages.isEmpty();
+			 }
+
 			 Message thisMessage=null;
 					 while(thisMessage==null)
 			 {
-			 synchronized (key) {
+
 				 if (b) {
 					 try {
-						 //		Thread.sleep(10);
 
 						 wait();
 
-					 } catch (InterruptedException e) {
-						 //notify();
+					 } catch (InterruptedException ignored) {
+
 
 
 
 					 }
 
 				 }
-			 }
-				  thisMessage = incommingMessages.poll();
+				 synchronized (key) {
+
+					 thisMessage = incommingMessages.poll();
+				 }
 		 }
 
 
 
 ///TODO: think about other option
-				if (thisMessage.getClass() == AttackEvent.class) {
-					AttackEvent Aevent = (AttackEvent) thisMessage;
-					//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-					Aevent.getCallback().call(Aevent);
-				}
-				if (thisMessage.getClass() == BombDestryerEvent.class) {
-					BombDestryerEvent bombevent = (BombDestryerEvent) thisMessage;
-					//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-					bombevent.getCallback().call(m);
-				}
-				if (thisMessage.getClass() == DeactivationEvent.class) {
-					DeactivationEvent deactivateevent = (DeactivationEvent) thisMessage;
-					//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-					deactivateevent.getCallback().call(m);
+		synchronized (key) {
+			if (thisMessage.getClass() == AttackEvent.class) {
+				AttackEvent Aevent = (AttackEvent) thisMessage;
+				//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+				Aevent.getCallback().call(Aevent);
+			}
+			if (thisMessage.getClass() == BombDestryerEvent.class) {
+				BombDestryerEvent bombevent = (BombDestryerEvent) thisMessage;
+				//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+				bombevent.getCallback().call(m);
+			}
+			if (thisMessage.getClass() == DeactivationEvent.class) {
+				DeactivationEvent deactivateevent = (DeactivationEvent) thisMessage;
+				//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+				deactivateevent.getCallback().call(m);
 
 
-				}
-				if (thisMessage.getClass() == BroadcastImpl.class) {
-					BroadcastImpl BroadcastImpl = (BroadcastImpl) thisMessage;
-					//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
-					BroadcastImpl.getCallback().call(m);
-				}
+			}
+			if (thisMessage.getClass() == BroadcastImpl.class) {
+				BroadcastImpl BroadcastImpl = (BroadcastImpl) thisMessage;
+				//       Attack currentAttack=new Attack(attackEvent.getSerialNumbers(),attackEvent.getDuration()); //
+				BroadcastImpl.getCallback().call(m);
+			}
+		}
+			return thisMessage;
 
-				return thisMessage;
 
 
-
-	}
-		 wait();
-		return null;
 
 
 	}

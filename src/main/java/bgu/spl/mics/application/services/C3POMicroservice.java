@@ -4,7 +4,7 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.passiveObjects.Diary;
-import bgu.spl.mics.application.passiveObjects.Ewoks;
+
 
 
 /**
@@ -16,7 +16,8 @@ import bgu.spl.mics.application.passiveObjects.Ewoks;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class C3POMicroservice extends MicroService {
-	
+
+    private long finishattacking;
     public C3POMicroservice(MessageBusImpl messageBus) {
         super("C3PO");
     }
@@ -41,52 +42,16 @@ public class C3POMicroservice extends MicroService {
         //subscribe broadcast
         //run ->if nothing wait for messages
     }
-    public void InitiateAttack(Message current) {
 
-       /* CallbackAttack callbackAttack=new CallbackAttack();
-        callbackAttack.call(current);
-*/
-
-        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
-        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
+    public void InitiateAttack() {
 
 
-        /*
-        AttackEvent currentAttack = (AttackEvent) current;
-        for (int i = 0; i < currentAttack.getSerialNumbers().size(); i++){
-
-            if (Ewoks.getInstance().getEwokList().get(i).isAvailable()) {
-                Ewoks.getInstance().getEwokList().get(i).acquire();
-                ///TODO TO CHECK ISSUE OF AQUIRED AND NOT USE BECAUSE THE WAIT
-            } else {
-                try {
-                    i--;
-                    wait();
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        }
+        finishattacking=System.currentTimeMillis();
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),finishattacking));
+        Diary.getInstance().setLittleDiary(getName()+"Finish",finishattacking);
 
 
 
-        try {
-            wait(currentAttack.getDuration());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        (currentAttack.getSerialNumbers()).forEach((temp) ->{
-            Ewoks.getInstance().getEwokList().get(temp).release();
-            Ewoks.getInstance().getEwokList().get(temp).notify();
-        });
-        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
-        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
-*/
     }
 
 

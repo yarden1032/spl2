@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
-import bgu.spl.mics.MessageBusImpl;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,9 +45,12 @@ for (int i=0;i<l.size();i++)
 
     public boolean isAvailable(int serial)
     {
-        return ewokList.get(serial-1).isAvailable();
+        return ewokList.get(serial).isAvailable();
     }
-
+    public void release()
+    {
+        ewokList.clear();
+    }
 
 
 }

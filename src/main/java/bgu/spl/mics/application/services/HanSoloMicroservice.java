@@ -5,10 +5,7 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.passiveObjects.Diary;
-import bgu.spl.mics.application.passiveObjects.Ewoks;
 
-import java.util.Collections;
-import java.util.List;
 
 /**
  * HanSoloMicroservices is in charge of the handling {@link AttackEvent}.
@@ -20,6 +17,8 @@ import java.util.List;
  */
 public class HanSoloMicroservice extends MicroService {
 
+
+    long finishattacking;
     public HanSoloMicroservice(MessageBusImpl messageBus) {
         super("Han");
         initialize(messageBus);
@@ -43,57 +42,19 @@ public class HanSoloMicroservice extends MicroService {
         MessageBusImpl.getInstance().subscribeBroadcast(Broadcast.class,this);
 
 
-        //this is empty initialize - we won't use it
-    }
-
-    public void InitiateAttack(Message current) {
-
-
-     /*   CallbackAttack callbackAttack=new CallbackAttack();
-        callbackAttack.call(current);*/
-
-
-        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
-        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
-
-         /*
-
-        AttackEvent currentAttack = (AttackEvent) current;
-        for (int i = 0; i < currentAttack.getSerialNumbers().size(); i++){
-
-            if (Ewoks.getInstance().getEwokList().get(i).isAvailable()) {
-                Ewoks.getInstance().getEwokList().get(i).acquire();
-                ///TODO TO CHECK ISSUE OF AQUIRED AND NOT USE BECAUSE THE WAIT
-            } else {
-                try {
-                    i--;
-                    wait();
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
 
     }
 
+    public void InitiateAttack() {
 
 
-        try {
-            wait(currentAttack.getDuration());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        (currentAttack.getSerialNumbers()).forEach((temp) ->{
-                Ewoks.getInstance().getEwokList().get(temp).release();
-            Ewoks.getInstance().getEwokList().get(temp).notify();
-        });
+         finishattacking = System.currentTimeMillis();
 
-        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
-        Diary.getInstance().setLittleDiary(getName()+"Finish",System.currentTimeMillis());
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(), finishattacking));
+        Diary.getInstance().setLittleDiary(getName()+"Finish", finishattacking);
 
-    */
+
     }
 
 

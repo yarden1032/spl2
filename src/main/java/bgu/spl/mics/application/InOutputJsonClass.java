@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class InOutputJsonClass {
 
-    private static Object Attack;
+
 
     public static Map Read (String inputString) {
         Reader reader = null;
@@ -39,8 +39,7 @@ public class InOutputJsonClass {
     }
 
     public static ArrayList readAttack (Map map) {
-        //  Map<int,int[]> map;
-        //     g.fromJson("attacks",map.);
+
 
         Map<String , ArrayList<Attack>>map2=map;
         Attack[] attacktoreturn=null;
@@ -63,7 +62,7 @@ public class InOutputJsonClass {
 
 
 
-        return arr;
+        return null;
     }
     public static double readOther (Map map,String string) {
         Map<String, Double> map2 = map;

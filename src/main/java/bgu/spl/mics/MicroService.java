@@ -28,8 +28,8 @@ import bgu.spl.mics.application.services.*;
 public abstract class MicroService implements Runnable { 
 
     private String name;
-   /* private int index=MessageBusImpl.getInstance().getAllMessages().indexOf(this);
-    private Queue<Message> incommingMessages=MessageBusImpl.getInstance().getAllMessages().get(index);*/
+    private boolean ToContinue=true;
+
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
@@ -150,8 +150,9 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
+
         Diary.getInstance().setLittleDiary(name+"Terminate",System.currentTimeMillis());
-        Thread.currentThread().interrupt();
+        this.ToContinue=false;
 
     }
 
@@ -167,52 +168,44 @@ public abstract class MicroService implements Runnable {
      * The entry point of the micro-service. TODO: you must complete this code
      * otherwise you will end up in an infinite loop.
      */
+
     @Override
     public final void run() {
         initialize();
-        while (true) {
+        while (ToContinue) {
             try {
 
                 Message current = MessageBusImpl.getInstance().awaitMessage(this);
 
-                if (current!=null) {
+                    if (current != null) {
 
-                    if ("Han".equals(getName()) && current.getClass() == AttackEvent.class) {
-                        ((HanSoloMicroservice) this).InitiateAttack(current);
-                    }
-
-                    if (("C3PO".equals(getName()) && current.getClass() == AttackEvent.class)) {
-                        ((C3POMicroservice) this).InitiateAttack(current);
-
-                    }
-                    if (("R2D2".equals(getName()) && current.getClass() == DeactivationEvent.class)) {
-                        ((R2D2Microservice) this).InitiateDeactivation();
-                    }
-                    if (("Lando".equals(getName()) && current.getClass() == BombDestryerEvent.class)) {
-                        ((LandoMicroservice) this).InitiateBombardment();
-                    }
-                    if (current.getClass() == BroadcastImpl.class) {
-                        if (this.getName().equals("Leia")) {
-                            ((LeiaMicroservice) this).handleBoradcast(current);
-                        }
-                        BroadcastImpl b = (BroadcastImpl) current;
-                        if (b.getWhoSendIt().equals("Leia")) {
-                            terminate();
-
+                        if ("Han".equals(getName()) && current.getClass() == AttackEvent.class) {
+                            ((HanSoloMicroservice) this).InitiateAttack();
                         }
 
+                        if (("C3PO".equals(getName()) && current.getClass() == AttackEvent.class)) {
+                            ((C3POMicroservice) this).InitiateAttack();
 
+                        }
+                        if (("R2D2".equals(getName()) && current.getClass() == DeactivationEvent.class)) {
+                            ((R2D2Microservice) this).InitiateDeactivation();
+                        }
+                        if (("Lando".equals(getName()) && current.getClass() == BombDestryerEvent.class)) {
+                            ((LandoMicroservice) this).InitiateBombardment();
+                        }
+                        if (current.getClass() == BroadcastImpl.class) {
+                            if (this.getName().equals("Leia")) {
+                                ((LeiaMicroservice) this).handleBoradcast(current);
+                            }
+                            BroadcastImpl b = (BroadcastImpl) current;
+                            if (b.getWhoSendIt().equals("Lando")) {
+                                terminate();
+
+                            }
+
+
+                        }
                     }
-                }
-                else {
-                  /*  Object obj=new Object();
-                    synchronized (obj){*/
-
-
-
-                  //  MessageBusImpl.getInstance().wait();
-
-                }
 
 
             } catch (InterruptedException e) {
@@ -223,8 +216,8 @@ public abstract class MicroService implements Runnable {
             }
 
 
-
         }
-    }
+        }
+
 
 }

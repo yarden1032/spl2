@@ -6,9 +6,9 @@ import bgu.spl.mics.CallbackBroadcast;
 
 
 public class BroadcastImpl implements Broadcast {
-    private CallbackBroadcast callbackBroadcast;
-    private String whoSendIt;
-    private long whenSentIt;
+    private final CallbackBroadcast callbackBroadcast;
+    private final String whoSendIt;
+    private final long whenSentIt;
 
     public BroadcastImpl(String whoSendIt, long whenSentIt) {
         this.whoSendIt = whoSendIt;

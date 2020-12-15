@@ -1,7 +1,6 @@
 package bgu.spl.mics.application.messages;
 
 import bgu.spl.mics.Callback;
-import bgu.spl.mics.CallbackAttack;
 import bgu.spl.mics.CallbackDeactivation;
 import bgu.spl.mics.Event;
 

@@ -11,8 +11,8 @@ import java.util.List;
  * Do not add to this class nothing but a single constructor, getters and setters.
  */
 public class Diary {
-    List<Object> littleDiary;
-
+   private List<Object> littleDiary;
+    private final Object ob=new Object();
     //to Know: first will be the string and second will be timestemp
 
     private static class SingletonHolder{
@@ -23,20 +23,45 @@ public class Diary {
         return Diary.SingletonHolder.instance;
     }
 
+
     public Diary()
     {
-        littleDiary= new LinkedList<Object>();
+        littleDiary= new LinkedList<>();
     }
+
+
     public void setLittleDiary (String message,long timestamp)
     {
         Object arr[]=new Object[2];
         arr[0]=message;
         arr[1]=timestamp;
-        if (message.equals("TotalAttacks"))
-        {
-            littleDiary.add(0,arr);
-        }
-        littleDiary.add(arr);
+
+        synchronized (ob) {
+
+                if (message.equals("TotalAttacks")) {
+                    littleDiary.add(0, arr);
+
+                } else {
+                    for (int i = 0; i < littleDiary.size(); i++) {
+                        Object[] tempObject = (Object[]) littleDiary.get(i);
+                        if ((long) tempObject[1] > timestamp) {
+                            littleDiary.add(i, arr);
+                            return;
+                        }
+                    }
+                    littleDiary.add(arr);
+
+                }
+
+
+            }
+
+
+
+
+
+
+
 
 
 
@@ -46,8 +71,10 @@ public class Diary {
         return littleDiary;
     }
 
-
-
+    public void destructorForTest ()
+    {
+        littleDiary.clear();
+    }
 
 
 }

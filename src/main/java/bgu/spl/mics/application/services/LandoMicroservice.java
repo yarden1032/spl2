@@ -3,8 +3,10 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.Broadcast;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.AttackEvent;
+
 import bgu.spl.mics.application.messages.BombDestryerEvent;
+import bgu.spl.mics.application.messages.BroadcastImpl;
+
 
 /**
  * LandoMicroservice
@@ -44,11 +46,12 @@ public class LandoMicroservice  extends MicroService {
     }
     public void InitiateBombardment()
     {
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+
+
+
+
+
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
     }
 
 }

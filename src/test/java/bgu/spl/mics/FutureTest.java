@@ -28,7 +28,7 @@ public class FutureTest {
         future3 = new Future<>();
     }
 }
-/*    @Test
+    @Test
     public void testResolve(){
         String str = "someResult";
         future.resolve(str);
@@ -48,11 +48,9 @@ public class FutureTest {
 
 
     @Test
-   /* public void testfuture(){
+    public void testfuture(){
 
-        assertTrue(future2.isDone());
-        TimeUnit time = TimeUnit.SECONDS;
-        LocalTime date1= LocalTime.now();
+        assertFalse(future2.isDone());
         future2.get(10,time);
         LocalTime date2= LocalTime.now();
         LocalTime date3=date2.minus(10, ChronoUnit.SECONDS);
@@ -63,4 +61,4 @@ public class FutureTest {
 
     }
 }
-*/
+

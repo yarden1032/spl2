@@ -2,6 +2,7 @@ package bgu.spl.mics.application.passiveObjects;
 
 import java.util.Objects;
 
+
 /**
  * Passive data-object representing a forest creature summoned when HanSolo and C3PO receive AttackEvents.
  * You must not alter any of the given public methods of this class.
@@ -12,36 +13,31 @@ public class Ewok {
 	int serialNumber;
 	boolean available;
 	boolean inUse=false;
+
     Object key = new Object();
 
     public Ewok (int serialNumber)
     {
         this.serialNumber=serialNumber;
         available=true;
+
     }
-    public void setSerialNumber(int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
+
 
     public int getSerialNumber() {
         return serialNumber;
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
+
 
     public  boolean isAvailable() {
         synchronized (key) {
-           // while (inUse) {
 
-
-
-
-            //}
             return available;
 
         }
+
+
 
 
 
@@ -81,6 +77,10 @@ public class Ewok {
          * release an Ewok
          */
         public  void release () {
+
+
+
+
             synchronized (key) {
                 { inUse = true;
                     this.available = true;
@@ -90,5 +90,8 @@ public class Ewok {
                 }
 
             }
+
+
+
         }
     }

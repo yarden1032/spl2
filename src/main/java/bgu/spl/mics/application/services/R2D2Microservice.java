@@ -1,10 +1,10 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.Broadcast;
-import bgu.spl.mics.CallbackDeactivation;
+
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.BombDestryerEvent;
+
 import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.passiveObjects.Diary;
@@ -53,19 +53,10 @@ public class R2D2Microservice extends MicroService {
 
     public void InitiateDeactivation()
     {
-    //  CallbackDeactivation callbackDeactivation= new CallbackDeactivation();
-   //     callbackDeactivation.call(duration);
 
-        Diary.getInstance().setLittleDiary(getName()+"R2D2Deactivate",System.currentTimeMillis());
+
+        Diary.getInstance().setLittleDiary(getName()+"Deactivate",System.currentTimeMillis());
         MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl(getName(),System.currentTimeMillis()));
-        /*try {
-            wait(duration);
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-
-     */
     }
 }

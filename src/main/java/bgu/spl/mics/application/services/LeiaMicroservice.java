@@ -10,7 +10,7 @@ import bgu.spl.mics.application.messages.BroadcastImpl;
 import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import bgu.spl.mics.application.passiveObjects.Diary;
-import bgu.spl.mics.application.passiveObjects.Ewoks;
+
 
 /**
  * LeiaMicroservices Initialized with Attack objects, and sends them as  {@link AttackEvent}.
@@ -48,7 +48,7 @@ public class LeiaMicroservice extends MicroService {
         //run ->if nothing wait for messages
 
     }
-    public synchronized void startAttack () {
+    public void startAttack () {
         Object ob = new Object();
         synchronized (ob) {
             for (int i = 0; i < attacks.length; i++) {
@@ -73,7 +73,7 @@ public class LeiaMicroservice extends MicroService {
             {
                 DeactivationEvent deactivationEvent= new DeactivationEvent();
                 MessageBusImpl.getInstance().sendEvent(deactivationEvent);
-                Diary.getInstance().setLittleDiary("TotalAttacks",System.currentTimeMillis());
+                Diary.getInstance().setLittleDiary("TotalAttacks",counterAttackerfinish);
             }
 
 
@@ -83,10 +83,6 @@ public class LeiaMicroservice extends MicroService {
             BombDestryerEvent bombDestryerEvent=new BombDestryerEvent();
             MessageBusImpl.getInstance().sendEvent(bombDestryerEvent);
         }
-        if (b.getWhoSendIt().equals("Lando"))
-        {
-            BroadcastImpl broadcast=new BroadcastImpl("Leia",System.currentTimeMillis());
-            MessageBusImpl.getInstance().sendBroadcast(broadcast);
-        }
+
     }
 }
