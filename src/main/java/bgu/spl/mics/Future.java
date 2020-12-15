@@ -47,10 +47,9 @@ public class Future<T> {
      * Resolves the result of this Future object.
      */
 	public void resolve (T result) {
-
 		this.result=result;
 		isDone=true;
-		notify();
+		Thread.currentThread().interrupt();
 	}
 	
 	/**
@@ -78,7 +77,7 @@ public class Future<T> {
 
 		if (!isDone)
 			try {
-				wait(unit.toMillis(timeout));
+				Thread.sleep(unit.toMillis(timeout));
 			} catch (InterruptedException ignored) {
 
 			}

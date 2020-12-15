@@ -18,20 +18,20 @@ public class Ewoktest {
     @Test
     public void testEwok() {
         int n = 50;
-
+        Ewoks.getInstance().release();
 
         for (int i = 1; i <= 50; i++) {
             List<Ewok> ewokList = new LinkedList<>();
             ewokList.add(new Ewok(i));
             Ewoks.getInstance().add(ewokList);
-            assertTrue(Ewoks.getInstance().isAvailable(i));
-            Ewoks.getInstance().getEwokList().get(i).acquire();
-            assertFalse(Ewoks.getInstance().isAvailable(i));
-            Ewoks.getInstance().getEwokList().get(i).release();
-            assertTrue(Ewoks.getInstance().isAvailable(i));
+            assertTrue(Ewoks.getInstance().isAvailable(i-1));
+            Ewoks.getInstance().getEwokList().get(i-1).acquire();
+            assertFalse(Ewoks.getInstance().isAvailable(i-1));
+            Ewoks.getInstance().getEwokList().get(i-1).release();
+            assertTrue(Ewoks.getInstance().isAvailable(i-1));
         }
         assertEquals(Ewoks.getInstance().getEwokList().size(), 50);
 
-
+Ewoks.getInstance().release();
     }
 }

@@ -27,7 +27,7 @@ public class FutureTest {
         future2 = new Future<>();
         future3 = new Future<>();
     }
-}
+
     @Test
     public void testResolve(){
         String str = "someResult";
@@ -51,13 +51,13 @@ public class FutureTest {
     public void testfuture(){
 
         assertFalse(future2.isDone());
-        future2.get(10,time);
-        LocalTime date2= LocalTime.now();
-        LocalTime date3=date2.minus(10, ChronoUnit.SECONDS);
-       if(!date3.isBefore(date1))
-       {
-           assertEquals(date3, date1);
-       }
+        TimeUnit time=TimeUnit.MILLISECONDS;
+        Long timenow=System.currentTimeMillis();
+        future2.get(100,time);
+        Long timeAfter=System.currentTimeMillis();
+
+           assertTrue(timeAfter-timenow<=120);
+
 
     }
 }

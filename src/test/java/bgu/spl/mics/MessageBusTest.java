@@ -1,9 +1,19 @@
 package bgu.spl.mics;
 
 import bgu.spl.mics.application.messages.AttackEvent;
-import bgu.spl.mics.application.passiveObjects.Attack;
+import bgu.spl.mics.application.messages.BroadcastImpl;
+
 import bgu.spl.mics.application.passiveObjects.Diary;
+
+import bgu.spl.mics.application.passiveObjects.Ewok;
+import bgu.spl.mics.application.passiveObjects.Ewoks;
+import bgu.spl.mics.application.services.HanSoloMicroservice;
+
 import org.junit.jupiter.api.Test;
+
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,15 +23,14 @@ public class MessageBusTest {
     private MicroService microService1;
     private MicroService microService2;
     private MicroService microService3;
+    private HanSoloMicroservice hanSoloMicroservice;
 
     public void setUp() {
         messageBus = new MessageBusImpl();
-        microService1 = new MicroService("Test") {
-            @Override
-            protected void initialize() {
+  //      microService1 = new MicroService("Test");
+        hanSoloMicroservice=new HanSoloMicroservice(MessageBusImpl.getInstance());
 
-            }
-        };
+
         microService2 = new MicroService("Test2") {
             @Override
             protected void initialize() {
@@ -41,70 +50,103 @@ public class MessageBusTest {
 
     public void testRegister() {
 
-        messageBus.register(microService1);
+
+        hanSoloMicroservice = new HanSoloMicroservice(MessageBusImpl.getInstance());
+        try {
+            Thread test = new Thread(hanSoloMicroservice);
+            test.start();
+            Thread.sleep(2000);
+
+            Integer[] a = new Integer[1];
+            a[0]=1;
+            List<Ewok> ewoks=new LinkedList<>();
+            for (int i=1;i<20;i++)
+            {
+                ewoks.add(new Ewok(i));
+            }
+            Ewoks ewoks1=new Ewoks();
+            Ewoks.getInstance().add(ewoks);
+            Event eventest = new AttackEvent(a, 100);
+
+
+            MessageBusImpl.getInstance().subscribeEvent(AttackEvent.class, microService1);
+
+
+            MessageBusImpl.getInstance().sendEvent(eventest);
+
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            }
+
+            assertTrue(test.getState() == Thread.State.WAITING);
+            MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl("Lando", System.currentTimeMillis()));
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            }
+
+            Diary.getInstance().destructorForTest();
+            MessageBusImpl.getInstance().unregister(hanSoloMicroservice);
+        } catch (NullPointerException | InterruptedException e) {
+
+        }
+
 
         //נוצר פה תור
 
-        Integer[] a = new Integer[5];
-        Event eventest = new AttackEvent(a, 100);
-
-
-        messageBus.subscribeEvent(AttackEvent.class, microService1);
-
-        try {
-            messageBus.sendEvent(eventest);
-            messageBus.awaitMessage(microService1);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail("Test Fail - no message received");
-        }
-
     }
-
 
     @Test
     public void testRegister_fail() {
 
-        messageBus.register(microService1); //נוצר פה תור
+            List<Ewok> ewoks=new LinkedList<>();
+            for (int i=1;i<20;i++)
+            {
+                ewoks.add(new Ewok(i));
+            }
+            Ewoks ewoks1=new Ewoks();
+            Ewoks.getInstance().add(ewoks);
 
 
-        Thread test = new Thread(microService1);
+        hanSoloMicroservice=new HanSoloMicroservice(MessageBusImpl.getInstance());
+        Thread test = new Thread(hanSoloMicroservice);
         test.start();
-        Integer[] a = new Integer[5];
+        MessageBusImpl.getInstance().unregister(hanSoloMicroservice);
+        try {
+            Thread.sleep(2000); //נוצר פה תור
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+        Integer[] a = new Integer[1];
+        a[0]=2;
         Event eventest = new AttackEvent(a, 100);
-        messageBus.sendEvent(eventest);
+        MessageBusImpl.getInstance().sendEvent(eventest);
 
         test.interrupt();
-        String st = (String) (((Object[]) Diary.getInstance().getLittleDiary().get(0))[0]);
+        //String st = (String) (((Object[]) Diary.getInstance().getLittleDiary().get(0))[0]);
 
-        assertNotEquals(Diary.getInstance().getLittleDiary().size(), 0);
+        assertTrue(Diary.getInstance().getLittleDiary().size()<=1);
 
+        MessageBusImpl.getInstance().sendBroadcast(new BroadcastImpl("Lando", System.currentTimeMillis()));
+        Diary.getInstance().destructorForTest();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        MessageBusImpl.getInstance().unregister(hanSoloMicroservice);
+        Ewoks.getInstance().release();
+        Diary.getInstance().destructorForTest();
 
     }
 
 
-    @Test
-
-    public void testUnRegister() {
-
-        messageBus.register(microService1); //נוצר פה תור
-
-
-        Thread test = new Thread(microService1);
-        test.start();
-        Integer[] a = new Integer[5];
-        Event eventest = new AttackEvent(a, 100);
-        MessageBusImpl.getInstance().unregister(microService1);
-        messageBus.sendEvent(eventest);
-
-        test.interrupt();
-        String st = (String) (((Object[]) Diary.getInstance().getLittleDiary().get(0))[0]);
-
-        assertNotEquals(Diary.getInstance().getLittleDiary().size(), 0);
-
-
-    }
 
 
 }
